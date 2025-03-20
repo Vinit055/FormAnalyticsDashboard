@@ -27,7 +27,7 @@ const DRAFT_STORAGE_KEY = "registration_form_draft";
 const RegistrationFormInternal = () => {
   const [activeTab, setActiveTab] = useState("personal");
 
-  const { trackTabChange, trackFormSubmit, exportAnalytics } = useAnalytics();
+  const { trackTabChange, trackFormSubmit } = useAnalytics();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
