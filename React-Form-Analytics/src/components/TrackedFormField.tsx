@@ -12,7 +12,7 @@ import {
 import { TrackedFormFieldProps } from "../types";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
-const ERROR_PERSISTENCE_THRESHOLD = 5000; // 5 seconds
+const ERROR_PERSISTENCE_THRESHOLD = 60000; // 1 minute
 const TrackedFormField: React.FC<TrackedFormFieldProps> = ({
   name,
   label,

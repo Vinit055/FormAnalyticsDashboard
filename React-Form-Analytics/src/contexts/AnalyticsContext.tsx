@@ -7,6 +7,7 @@ import React, {
   useRef,
 } from "react";
 import { AnalyticsContextType } from "@/types";
+import axios from "axios";
 import {
   analyticsReducer,
   createInitialAnalyticsState,
@@ -15,6 +16,7 @@ import {
 
 // Constants
 const IDLE_TIMEOUT = 10 * 60 * 1000;
+const API_URL = "http://127.0.0.1:8000";
 // Create context
 const AnalyticsContext = createContext<AnalyticsContextType | undefined>(
   undefined
@@ -94,7 +96,7 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Export analytics data
   const exportAnalytics = useCallback(
-    (reason: "submit" | "tabClose" | "idle" = "submit") => {
+    async (reason: "submit" | "tabClose" | "idle" = "submit") => {
       // First, create clean tab objects without lastVisitTime
       const cleanTabs: Record<
         string,
@@ -131,28 +133,36 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
         exportReason: reason,
       };
 
-      const dataStr = JSON.stringify(completeAnalytics, null, 2);
-      const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(
-        dataStr
-      )}`;
+      try {
+        // Send analytics data to API server
+        await axios.post(`${API_URL}/formAnalytics`, completeAnalytics);
 
-      const exportFileDefaultName = `form_analytics_${new Date().toISOString()}.json`;
+        // After sending to server, update the state to match what we exported
+        if (reason === "submit") {
+          dispatch({ type: "FORM_SUBMIT" });
+        } else if (reason === "tabClose" || reason === "idle") {
+          dispatch({ type: "FORM_ABANDON" });
+        }
+        dispatch({ type: "SET_EXPORT_REASON", reason });
 
-      const linkElement = document.createElement("a");
-      linkElement.setAttribute("href", dataUri);
-      linkElement.setAttribute("download", exportFileDefaultName);
-      linkElement.click();
+        // Additionally dispatch a tab finalization action
+        dispatch({ type: "FINALIZE_TAB_TIMES" });
+      } catch (error) {
+        console.error("Failed to send analytics data to server:", error);
 
-      // After exporting, update the state to match what we exported
-      if (reason === "submit") {
-        dispatch({ type: "FORM_SUBMIT" });
-      } else if (reason === "tabClose" || reason === "idle") {
-        dispatch({ type: "FORM_ABANDON" });
+        // Fallback to client-side download if API fails
+        const dataStr = JSON.stringify(completeAnalytics, null, 2);
+        const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(
+          dataStr
+        )}`;
+
+        const exportFileDefaultName = `form_analytics_${new Date().toISOString()}.json`;
+
+        const linkElement = document.createElement("a");
+        linkElement.setAttribute("href", dataUri);
+        linkElement.setAttribute("download", exportFileDefaultName);
+        linkElement.click();
       }
-      dispatch({ type: "SET_EXPORT_REASON", reason });
-
-      // Additionally dispatch a tab finalization action
-      dispatch({ type: "FINALIZE_TAB_TIMES" });
     },
     [analytics, dispatch]
   );
