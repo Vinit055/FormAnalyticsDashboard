@@ -169,24 +169,32 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Track when user leaves/closes the page
   useEffect(() => {
-    const handlePageHide = (event: PageTransitionEvent) => {
-      if (!analytics.formSubmitted) {
-        dispatch({ type: "FORM_ABANDON" });
-
-        // Only export analytics for tab close (not for refresh)
-        // event.persisted is true when page might be restored from bfcache (refresh)
-        if (!event.persisted) {
-          exportAnalytics("tabClose");
-        }
-      }
+    // Define event handlers
+    const handleUnload = () => {
+      // Use navigator.sendBeacon for reliable data sending during page unload
+      const blob = new Blob(
+        [
+          JSON.stringify({
+            ...analytics,
+            formAbandoned: true,
+            exportReason: "tabClose",
+          }),
+        ],
+        { type: "application/json" }
+      );
+      navigator.sendBeacon(`${API_URL}/formAnalytics`, blob);
     };
 
-    window.addEventListener("pagehide", handlePageHide);
+    // Add event listeners
+    window.addEventListener("unload", handleUnload);
+    window.addEventListener("beforeunload", handleUnload);
 
+    // Clean up event listeners on component unmount
     return () => {
-      window.removeEventListener("pagehide", handlePageHide);
+      window.removeEventListener("unload", handleUnload);
+      window.removeEventListener("beforeunload", handleUnload);
     };
-  }, [analytics.formSubmitted, exportAnalytics]);
+  }, [analytics]);
 
   const contextValue = useMemo(
     () => ({
