@@ -2,7 +2,6 @@ import React from "react";
 import { TabsContent } from "@/components/ui/tabs";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,38 +17,19 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { InfoProps } from "@/types";
+import TrackedFormField from "@/components/TrackedFormField";
 
 const ProfessionalInfo: React.FC<InfoProps> = ({ control }) => {
   return (
     <TabsContent value="professional" className="space-y-4 mt-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField
-          control={control}
-          name="occupation"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Occupation</FormLabel>
-              <FormControl>
-                <Input placeholder="Software Engineer" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <TrackedFormField name="occupation" label="Occupation">
+          <Input placeholder="Software Engineer" />
+        </TrackedFormField>
 
-        <FormField
-          control={control}
-          name="companyName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Company Name (Optional)</FormLabel>
-              <FormControl>
-                <Input placeholder="Tech Company Inc." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <TrackedFormField name="companyName" label="Company Name (Optional)">
+          <Input placeholder="Tech Company Inc." />
+        </TrackedFormField>
 
         <FormField
           control={control}
@@ -96,26 +76,16 @@ const ProfessionalInfo: React.FC<InfoProps> = ({ control }) => {
         />
       </div>
 
-      <FormField
-        control={control}
+      <TrackedFormField
         name="skills"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Skills & Expertise</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="List your key skills separated by commas (e.g., React, TypeScript, Project Management)"
-                className="min-h-32"
-                {...field}
-              />
-            </FormControl>
-            <FormDescription>
-              Include both technical and soft skills relevant to your profession
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        label="Skills & Expertise"
+        description="Include both technical and soft skills relevant to your profession"
+      >
+        <Textarea
+          placeholder="List your key skills separated by commas (e.g., React, TypeScript, Project Management)"
+          className="min-h-32"
+        />
+      </TrackedFormField>
     </TabsContent>
   );
 };

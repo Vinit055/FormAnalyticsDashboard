@@ -1,3 +1,4 @@
+import TrackedFormField from "@/components/TrackedFormField";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -31,21 +32,19 @@ const PersonalInfo: React.FC<InfoProps> = ({ control }) => {
   return (
     <TabsContent value="personal" className="space-y-4 mt-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField
-          control={control}
-          name="firstName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>First Name</FormLabel>
-              <FormControl>
-                <Input placeholder="John" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <TrackedFormField name="firstName" label="First Name">
+          <Input placeholder="John" />
+        </TrackedFormField>
 
-        <FormField
+        <TrackedFormField name="lastName" label="Last Name">
+          <Input placeholder="Doe" />
+        </TrackedFormField>
+
+        <TrackedFormField name="email" label="Email">
+          <Input placeholder="john.doe@example.com" />
+        </TrackedFormField>
+
+        {/* <FormField
           control={control}
           name="lastName"
           render={({ field }) => (
@@ -75,21 +74,10 @@ const PersonalInfo: React.FC<InfoProps> = ({ control }) => {
               <FormMessage />
             </FormItem>
           )}
-        />
-
-        <FormField
-          control={control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone Number</FormLabel>
-              <FormControl>
-                <Input placeholder="1234567890" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        /> */}
+        <TrackedFormField name="phone" label="Phone Number">
+          <Input placeholder="1234567890" />
+        </TrackedFormField>
 
         <FormField
           control={control}
@@ -121,7 +109,7 @@ const PersonalInfo: React.FC<InfoProps> = ({ control }) => {
                     disabled={(date) =>
                       date > new Date() || date < new Date("1900-01-01")
                     }
-                    initialFocus
+                    autoFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -159,62 +147,22 @@ const PersonalInfo: React.FC<InfoProps> = ({ control }) => {
 
       <Separator className="my-4" />
 
-      <FormField
-        control={control}
-        name="address"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Address</FormLabel>
-            <FormControl>
-              <Input placeholder="123 Main St" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <TrackedFormField name="address" label="Address">
+        <Input placeholder="123 Main St" />
+      </TrackedFormField>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <FormField
-          control={control}
-          name="city"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>City</FormLabel>
-              <FormControl>
-                <Input placeholder="New York" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <TrackedFormField name="city" label="City">
+          <Input placeholder="New York" />
+        </TrackedFormField>
 
-        <FormField
-          control={control}
-          name="country"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Country</FormLabel>
-              <FormControl>
-                <Input placeholder="United States" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <TrackedFormField name="country" label="Country">
+          <Input placeholder="United States" />
+        </TrackedFormField>
 
-        <FormField
-          control={control}
-          name="zipCode"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ZIP Code</FormLabel>
-              <FormControl>
-                <Input placeholder="12345" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <TrackedFormField name="zipCode" label="ZIP Code">
+          <Input placeholder="12345" />
+        </TrackedFormField>
       </div>
     </TabsContent>
   );

@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useFormContext } from "react-hook-form";
+import React, { useEffect, useRef } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 import { FormValues } from "@/schemas/FormSchema";
 import {
   FormField,
@@ -12,6 +12,7 @@ import {
 import { TrackedFormFieldProps } from "../types";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
+const ERROR_PERSISTENCE_THRESHOLD = 5000; // 5 seconds
 const TrackedFormField: React.FC<TrackedFormFieldProps> = ({
   name,
   label,
@@ -20,16 +21,44 @@ const TrackedFormField: React.FC<TrackedFormFieldProps> = ({
 }) => {
   const { trackValidationError } = useAnalytics();
   const form = useFormContext<FormValues>();
+  const errorTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Track validation errors for this field
+  // Watch the field's value to detect changes
+  useWatch({
+    control: form.control,
+    name: name,
+  });
+
+  // Track validation errors for this field with time persistence check
   useEffect(() => {
-    if (form.formState.errors[name]) {
-      trackValidationError(
-        name,
-        form.formState.errors[name]?.message as string
-      );
+    const fieldError = form.formState.errors[name];
+
+    // Clear any existing timer when the error state changes
+    if (errorTimerRef.current) {
+      clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = null;
     }
-  }, [form.formState.errors[name], name, trackValidationError]);
+
+    // If there's an error, start a timer
+    if (fieldError) {
+      errorTimerRef.current = setTimeout(() => {
+        // After threshold time, if the error still exists, track it
+        if (form.formState.errors[name]) {
+          trackValidationError(
+            name,
+            form.formState.errors[name]?.message as string
+          );
+        }
+      }, ERROR_PERSISTENCE_THRESHOLD);
+    }
+
+    // Cleanup on unmount or when error state changes
+    return () => {
+      if (errorTimerRef.current) {
+        clearTimeout(errorTimerRef.current);
+      }
+    };
+  }, [form.formState.errors[name], name, trackValidationError, form.formState]);
 
   return (
     <FormField
@@ -41,7 +70,6 @@ const TrackedFormField: React.FC<TrackedFormFieldProps> = ({
           <FormControl>
             {React.cloneElement(children, {
               ...field,
-              // We no longer need custom focus/blur handlers
             })}
           </FormControl>
           {description && <FormDescription>{description}</FormDescription>}

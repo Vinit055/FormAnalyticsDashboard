@@ -8,6 +8,7 @@ export type AnalyticsAction =
   | { type: "FORM_SUBMIT" }
   | { type: "FORM_ABANDON" }
   | { type: "RESET_ANALYTICS" }
+  | { type: "FINALIZE_TAB_TIMES" }
   | {
       type: "SET_EXPORT_REASON";
       reason: "submit" | "tabClose" | "idle" | null;
@@ -91,21 +92,29 @@ export const analyticsReducer = (
   const now = Date.now();
 
   switch (action.type) {
-    case "VALIDATION_ERROR":
+    case "VALIDATION_ERROR": {
+      // Check if this exact error is already tracked to avoid duplicates
+      const isExistingError = state.fields[
+        action.field
+      ].validationErrors.includes(action.error);
+
+      // Only increment the error count if this is a new error
       return {
         ...state,
         fields: {
           ...state.fields,
           [action.field]: {
             ...state.fields[action.field],
-            validationErrors: [
-              ...state.fields[action.field].validationErrors,
-              action.error,
-            ],
+            validationErrors: isExistingError
+              ? state.fields[action.field].validationErrors
+              : [...state.fields[action.field].validationErrors, action.error],
           },
         },
-        validationErrorCount: state.validationErrorCount + 1,
+        validationErrorCount: isExistingError
+          ? state.validationErrorCount
+          : state.validationErrorCount + 1,
       };
+    }
 
     case "TAB_CHANGE": {
       const updatedTabs = { ...state.tabs };
@@ -135,20 +144,80 @@ export const analyticsReducer = (
       };
     }
 
-    case "FORM_SUBMIT":
+    case "FINALIZE_TAB_TIMES": {
+      const updatedTabs = { ...state.tabs };
+
+      // Update time spent on all tabs with active lastVisitTime
+      Object.keys(updatedTabs).forEach((tab) => {
+        if (updatedTabs[tab].lastVisitTime !== null) {
+          const tabTimeSpent = now - updatedTabs[tab].lastVisitTime;
+          updatedTabs[tab] = {
+            ...updatedTabs[tab],
+            totalTimeSpent: updatedTabs[tab].totalTimeSpent + tabTimeSpent,
+            lastVisitTime: null,
+          };
+        }
+      });
+
       return {
         ...state,
+        tabs: updatedTabs,
+      };
+    }
+
+    case "FORM_SUBMIT": {
+      // Calculate the total error count before exporting
+      const totalErrorCount = Object.values(state.fields).reduce(
+        (count, field) => count + field.validationErrors.length,
+        0
+      );
+
+      // Also finalize tab times when submitting form
+      const updatedTabs = { ...state.tabs };
+      Object.keys(updatedTabs).forEach((tab) => {
+        if (updatedTabs[tab].lastVisitTime !== null) {
+          const tabTimeSpent = now - updatedTabs[tab].lastVisitTime;
+          updatedTabs[tab] = {
+            ...updatedTabs[tab],
+            totalTimeSpent: updatedTabs[tab].totalTimeSpent + tabTimeSpent,
+            lastVisitTime: null,
+          };
+        }
+      });
+
+      return {
+        ...state,
+        validationErrorCount: totalErrorCount,
         formEndTime: now,
         formCompletionTime: now - state.formStartTime,
         formSubmitted: true,
+        formAbandoned: false,
+        exportReason: "submit",
+        tabs: updatedTabs,
       };
+    }
 
-    case "FORM_ABANDON":
+    case "FORM_ABANDON": {
+      // Also finalize tab times when abandoning form
+      const updatedTabs = { ...state.tabs };
+      Object.keys(updatedTabs).forEach((tab) => {
+        if (updatedTabs[tab].lastVisitTime !== null) {
+          const tabTimeSpent = now - updatedTabs[tab].lastVisitTime;
+          updatedTabs[tab] = {
+            ...updatedTabs[tab],
+            totalTimeSpent: updatedTabs[tab].totalTimeSpent + tabTimeSpent,
+            lastVisitTime: null,
+          };
+        }
+      });
+
       return {
         ...state,
         formEndTime: now,
         formAbandoned: true,
+        tabs: updatedTabs,
       };
+    }
 
     case "SET_EXPORT_REASON":
       return {

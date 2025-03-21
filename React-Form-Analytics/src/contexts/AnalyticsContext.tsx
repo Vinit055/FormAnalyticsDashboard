@@ -14,8 +14,7 @@ import {
 } from "@/utils/analyticsUtils";
 
 // Constants
-const IDLE_TIMEOUT = 10 * 60 * 1000; // 5 minutes in milliseconds
-
+const IDLE_TIMEOUT = 10 * 60 * 1000;
 // Create context
 const AnalyticsContext = createContext<AnalyticsContextType | undefined>(
   undefined
@@ -82,9 +81,7 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const trackFormSubmit = () => {
-    dispatch({ type: "FORM_SUBMIT" });
-    // Export the analytics after the state is updated
-    setTimeout(() => exportAnalytics("submit"), 0);
+    exportAnalytics("submit");
   };
 
   const trackFormAbandon = () => {
@@ -98,28 +95,43 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
   // Export analytics data
   const exportAnalytics = useCallback(
     (reason: "submit" | "tabClose" | "idle" = "submit") => {
-      // Create a copy of analytics that we'll update
-      let analyticsData = { ...analytics };
+      // First, create clean tab objects without lastVisitTime
+      const cleanTabs: Record<
+        string,
+        { visits: number; totalTimeSpent: number }
+      > = {};
+      const now = Date.now();
 
-      // Set the export reason
-      analyticsData.exportReason = reason;
+      // Calculate final tab times and create clean tab objects
+      Object.keys(analytics.tabs).forEach((tab) => {
+        const currentTab = analytics.tabs[tab];
+        let totalTime = currentTab.totalTimeSpent;
 
-      // Update form state based on reason
-      if (reason === "submit") {
-        analyticsData.formSubmitted = true;
-        analyticsData.formAbandoned = false;
-        // Set end time for form completion
-        analyticsData.formEndTime = new Date().getTime();
-        // Calculate completion time
-        const startTime = new Date(analyticsData.formStartTime).getTime();
-        const endTime = new Date().getTime();
-        analyticsData.formCompletionTime = endTime - startTime;
-      } else if (reason === "tabClose" || reason === "idle") {
-        analyticsData.formAbandoned = true;
-      }
+        if (currentTab.lastVisitTime !== null) {
+          totalTime += now - currentTab.lastVisitTime;
+        }
 
-      // Create file for download
-      const dataStr = JSON.stringify(analyticsData, null, 2);
+        // Create clean tab object (without lastVisitTime)
+        cleanTabs[tab] = {
+          visits: currentTab.visits,
+          totalTimeSpent: totalTime,
+        };
+      });
+
+      const completeAnalytics = {
+        ...analytics,
+        tabs: cleanTabs,
+        formEndTime: now,
+        formCompletionTime: now - analytics.formStartTime,
+        formSubmitted: reason === "submit" ? true : analytics.formSubmitted,
+        formAbandoned:
+          reason === "tabClose" || reason === "idle"
+            ? true
+            : analytics.formAbandoned,
+        exportReason: reason,
+      };
+
+      const dataStr = JSON.stringify(completeAnalytics, null, 2);
       const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(
         dataStr
       )}`;
@@ -130,8 +142,19 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
       linkElement.setAttribute("href", dataUri);
       linkElement.setAttribute("download", exportFileDefaultName);
       linkElement.click();
+
+      // After exporting, update the state to match what we exported
+      if (reason === "submit") {
+        dispatch({ type: "FORM_SUBMIT" });
+      } else if (reason === "tabClose" || reason === "idle") {
+        dispatch({ type: "FORM_ABANDON" });
+      }
+      dispatch({ type: "SET_EXPORT_REASON", reason });
+
+      // Additionally dispatch a tab finalization action
+      dispatch({ type: "FINALIZE_TAB_TIMES" });
     },
-    [analytics]
+    [analytics, dispatch]
   );
 
   // Track when user leaves/closes the page

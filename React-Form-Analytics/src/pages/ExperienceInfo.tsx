@@ -12,73 +12,39 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { InfoProps } from "@/types";
+import TrackedFormField from "@/components/TrackedFormField";
 
 const ExperienceInfo: React.FC<InfoProps> = ({ control }) => {
   return (
     <TabsContent value="experience" className="space-y-4 mt-4">
-      <FormField
-        control={control}
-        name="lifeGoals"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>What are your main life goals?</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Describe what you hope to achieve in your personal and professional life"
-                className="min-h-20"
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <TrackedFormField name="lifeGoals" label="What are your main life goals?">
+        <Textarea
+          placeholder="Describe what you hope to achieve in your personal and professional life"
+          className="min-h-20"
+        />
+      </TrackedFormField>
 
-      <FormField
-        control={control}
+      <TrackedFormField
         name="problemSolvingApproach"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>How do you approach complex problems?</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Describe your step-by-step process for tackling challenging situations"
-                className="min-h-32"
-                {...field}
-              />
-            </FormControl>
-            <FormDescription>
-              Think about a recent complex problem you solved and outline your
-              approach
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        label="How do you approach complex problems?"
+      >
+        <Textarea
+          placeholder="Describe your step-by-step process for tackling challenging situations"
+          className="min-h-32"
+        />
+      </TrackedFormField>
 
-      <FormField
-        control={control}
+      <TrackedFormField
         name="ethicalDilemma"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              Describe an ethical dilemma you've faced and how you resolved it
-            </FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Explain the situation, the conflicting values, and how you made your decision"
-                className="min-h-40"
-                {...field}
-              />
-            </FormControl>
-            <FormDescription>
-              This helps us understand your decision-making process and value
-              system
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        label="Describe an ethical dilemma you've faced and how you resolved it"
+        description=" This helps us understand your decision-making process and value
+              system"
+      >
+        <Textarea
+          placeholder="Explain the situation, the conflicting values, and how you made your decision"
+          className="min-h-40"
+        />
+      </TrackedFormField>
 
       <FormField
         control={control}

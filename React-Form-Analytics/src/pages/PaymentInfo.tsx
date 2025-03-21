@@ -1,17 +1,11 @@
 import React from "react";
 import { TabsContent } from "@/components/ui/tabs";
 import { CreditCard } from "lucide-react";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { InfoProps } from "@/types";
+import TrackedFormField from "@/components/TrackedFormField";
 
-const PaymentInfo: React.FC<InfoProps> = ({ control }) => {
+const PaymentInfo: React.FC<InfoProps> = () => {
   return (
     <TabsContent value="payment" className="space-y-4 mt-4">
       <div className="bg-slate-100 p-4 rounded-md mb-4">
@@ -25,62 +19,22 @@ const PaymentInfo: React.FC<InfoProps> = ({ control }) => {
         </p>
       </div>
 
-      <FormField
-        control={control}
-        name="cardName"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Cardholder Name</FormLabel>
-            <FormControl>
-              <Input placeholder="John Doe" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <TrackedFormField name="cardName" label="Cardholder Name">
+        <Input placeholder="John Doe" />
+      </TrackedFormField>
 
-      <FormField
-        control={control}
-        name="cardNumber"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Card Number</FormLabel>
-            <FormControl>
-              <Input placeholder="1234567890123456" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <TrackedFormField name="cardNumber" label="Card Number">
+        <Input placeholder="1234567890123456" />
+      </TrackedFormField>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField
-          control={control}
-          name="expiryDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Expiry Date</FormLabel>
-              <FormControl>
-                <Input placeholder="MM/YY" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <TrackedFormField name="expiryDate" label="Expiry Date">
+          <Input placeholder="MM/YY" />
+        </TrackedFormField>
 
-        <FormField
-          control={control}
-          name="cvv"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>CVV</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="123" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <TrackedFormField name="cvv" label="CVV">
+          <Input type="password" placeholder="123" />
+        </TrackedFormField>
       </div>
     </TabsContent>
   );
