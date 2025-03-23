@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    container_name: clickhouseDB
+    ports:
+      # HTTP interface
+      - "8123:8123"
+      # Native interface
+      - "9000:9000"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    restart: unless-stopped
+
+# To run: docker-compose up -d
+# To connect to clickhouse: docker exec -it clickhouseDB clickhouse-client
+# To stop: docker-compose stop
