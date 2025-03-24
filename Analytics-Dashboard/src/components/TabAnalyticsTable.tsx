@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { FormAnalyticsCollection } from "@/types/form-analytics";
+import type { FormAnalyticsCollection } from "@/types/types";
 import { formatTime, getTabAnalytics } from "@/lib/analytics-utils";
 
 interface TabAnalyticsTableProps {

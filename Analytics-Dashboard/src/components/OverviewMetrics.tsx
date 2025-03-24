@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { FormAnalyticsCollection } from "@/types/form-analytics";
+import type { FormAnalyticsCollection } from "@/types/types";
 import {
   calculateAbandonmentRate,
   calculateAverageCompletionTime,

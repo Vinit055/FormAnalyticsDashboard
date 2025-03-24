@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Clock,
@@ -11,8 +11,8 @@ import {
   X,
 } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-mobile";
-import type { FormAnalyticsCollection } from "@/types/form-analytics";
-import { mockAnalyticsData } from "@/data/mock-data";
+import type { FormAnalyticsCollection } from "@/types/types";
+import { fetchAllAnalytics } from "@/data/dataFetching";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,19 +24,28 @@ import {
 } from "@/components/ui/card";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { OverviewMetrics } from "@/components/overview-metrics";
-import { FormTimeChart } from "@/components/form-time-chart";
-import { SubmissionRateChart } from "@/components/submission-rate-chart";
-import { ValidationErrorsChart } from "@/components/validation-errors-chart";
-import { ProblemFieldsTable } from "@/components/problem-fields-table";
-import { TabAnalyticsTable } from "@/components/tab-analytics-table";
+import { OverviewMetrics } from "@/components/OverviewMetrics";
+import { FormTimeChart } from "@/components/FormTimeChart";
+import { SubmissionRateChart } from "@/components/SubmissionRateChart";
+import { ValidationErrorsChart } from "@/components/ValidationErrorsChart";
+import { ProblemFieldsTable } from "@/components/ProblemFieldsTable";
+import { TabAnalyticsTable } from "@/components/TabAnalyticsTable";
+import { SubmissionCompletionChart } from "./SubmissionCompletionChart";
 
 export default function Dashboard() {
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [analyticsData, setAnalyticsData] = useState<FormAnalyticsCollection>({
+    sessions: [],
+  });
 
-  // In a real application, this would come from an API or props
-  const analyticsData: FormAnalyticsCollection = mockAnalyticsData;
+  useEffect(() => {
+    async function loadData() {
+      const data = await fetchAllAnalytics();
+      setAnalyticsData(data);
+    }
+    loadData();
+  }, []);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -245,13 +254,13 @@ export default function Dashboard() {
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
                   <Card className="col-span-2">
                     <CardHeader>
-                      <CardTitle>Form Submission Trends</CardTitle>
+                      <CardTitle>Submission Completion Time</CardTitle>
                       <CardDescription>
-                        Daily submission rates over the past 30 days
+                        Distribution of time taken to complete submissions
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <FormTimeChart data={analyticsData} />
+                      <SubmissionCompletionChart data={analyticsData} />
                     </CardContent>
                   </Card>
                 </div>

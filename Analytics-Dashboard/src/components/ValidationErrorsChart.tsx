@@ -7,7 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { FormAnalyticsCollection } from "@/types/form-analytics";
+import type { FormAnalyticsCollection } from "@/types/types";
 import { getValidationErrorTypes } from "@/lib/analytics-utils";
 
 interface ValidationErrorsChartProps {

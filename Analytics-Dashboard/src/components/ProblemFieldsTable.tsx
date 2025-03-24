@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { FormAnalyticsCollection } from "@/types/form-analytics";
+import type { FormAnalyticsCollection } from "@/types/types";
 import { getTopProblemFields } from "@/lib/analytics-utils";
 
 interface ProblemFieldsTableProps {

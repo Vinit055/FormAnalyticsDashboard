@@ -1,5 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import type { FormAnalyticsCollection } from "@/types/form-analytics";
+import type { FormAnalyticsCollection } from "@/types/types";
 import {
   calculateAbandonmentRate,
   calculateSubmissionRate,
@@ -44,7 +44,7 @@ export function SubmissionRateChart({
           />
         </PieChart>
       </ResponsiveContainer>
-      <div className="mt-2 flex justify-center gap-6">
+      <div className="flex justify-center gap-6">
         {chartData.map((entry) => (
           <div key={`legend-${entry.name}`} className="flex items-center gap-2">
             <div
