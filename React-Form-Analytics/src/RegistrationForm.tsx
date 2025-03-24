@@ -91,6 +91,8 @@ const RegistrationFormInternal = () => {
     // Clear draft from localStorage after successful submission
     localStorage.removeItem(DRAFT_STORAGE_KEY);
     form.reset(form.formState.defaultValues);
+    setActiveTab("personal");
+
 
     // Show success message
     toast.success("Form submitted successfully!");
