@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Clock,
@@ -6,14 +6,13 @@ import {
   Home,
   LayoutDashboard,
   Menu,
+  RefreshCw,
   Settings,
   Users,
   X,
 } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-mobile";
-import type { FormAnalyticsCollection } from "@/types/types";
-import { fetchAllAnalytics } from "@/data/dataFetching";
-
+import "ldrs/hourglass";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,21 +31,48 @@ import { ProblemFieldsTable } from "@/components/ProblemFieldsTable";
 import { TabAnalyticsTable } from "@/components/TabAnalyticsTable";
 import { SubmissionCompletionChart } from "./SubmissionCompletionChart";
 import { ThemeToggle } from "@/theme/ThemeButton";
+import { useAnalyticsPolling } from "@/data/useAnalyticsPolling";
 
 export default function Dashboard() {
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [analyticsData, setAnalyticsData] = useState<FormAnalyticsCollection>({
-    sessions: [],
+  const [initialLoading, setInitialLoading] = useState(true);
+  const { data, loading, refetch } = useAnalyticsPolling({
+    pollingInterval: 60000, // Poll every minute
   });
 
+  // Add a 5-second initial loading state
   useEffect(() => {
-    async function loadData() {
-      const data = await fetchAllAnalytics();
-      setAnalyticsData(data);
-    }
-    loadData();
+    const timer = setTimeout(() => {
+      setInitialLoading(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, []);
+
+  // Use empty data object if still loading
+  const analyticsData = data || { sessions: [] };
+
+  // Show loader if in initial loading state or actual data loading
+  const isLoading = initialLoading || loading;
+
+  // If loading, show loader
+  if (isLoading) {
+    const HourglassElement = "l-hourglass" as any;
+    return (
+      <div className="flex flex-col min-h-screen items-center justify-center">
+        <HourglassElement
+          size="60"
+          bg-opacity="0.1"
+          speed="1.2"
+          color="#74ec7c"
+        ></HourglassElement>
+        <span className="mt-5 text-lg">
+          Hold on while we get your dashboard ready!
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -66,6 +92,16 @@ export default function Dashboard() {
           <span>Form Analytics</span>
         </div>
         <div className="ml-auto flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={refetch}
+            disabled={loading}
+            title="Refresh data"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            <span className="sr-only">Refresh</span>
+          </Button>
           <ThemeToggle />
         </div>
       </div>
