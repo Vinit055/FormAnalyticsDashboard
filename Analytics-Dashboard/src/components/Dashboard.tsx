@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Clock,
@@ -32,6 +32,7 @@ import { TabAnalyticsTable } from "@/components/TabAnalyticsTable";
 import { SubmissionCompletionChart } from "./SubmissionCompletionChart";
 import { ThemeToggle } from "@/theme/ThemeButton";
 import { useAnalyticsPolling } from "@/data/useAnalyticsPolling";
+import "./loader.css";
 
 export default function Dashboard() {
   const [open, setOpen] = useState(false);
@@ -58,15 +59,13 @@ export default function Dashboard() {
 
   // If loading, show loader
   if (isLoading) {
-    const HourglassElement = "l-hourglass" as keyof JSX.IntrinsicElements;
     return (
       <div className="flex flex-col min-h-screen items-center justify-center">
-        <HourglassElement
-          size={60}
-          bg-opacity="0.1"
-          speed="1.2"
-          color="#74ec7c"
-        />
+        <div className="container-loader">
+          <div className="half"></div>
+          <div className="half"></div>
+        </div>
+
         <span className="mt-5 text-lg">
           Hold on while we get your dashboard ready!
         </span>
