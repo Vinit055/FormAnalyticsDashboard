@@ -43,7 +43,6 @@ export default function Dashboard() {
   useEffect(() => {
     async function loadData() {
       const data = await fetchAllAnalytics();
-      console.log("Vinit", data);
       setAnalyticsData(data);
     }
     loadData();
@@ -82,12 +81,6 @@ export default function Dashboard() {
               </div>
             </div>
             <nav className="grid gap-1 p-4">
-              <Button variant="ghost" className="justify-start gap-2" asChild>
-                <div>
-                  <Home className="h-4 w-4" />
-                  Home
-                </div>
-              </Button>
               <Button
                 variant="secondary"
                 className="justify-start gap-2"
@@ -102,18 +95,6 @@ export default function Dashboard() {
                 <div>
                   <BarChart className="h-4 w-4" />
                   Reports
-                </div>
-              </Button>
-              <Button variant="ghost" className="justify-start gap-2" asChild>
-                <div>
-                  <Users className="h-4 w-4" />
-                  Users
-                </div>
-              </Button>
-              <Button variant="ghost" className="justify-start gap-2" asChild>
-                <div>
-                  <Settings className="h-4 w-4" />
-                  Settings
                 </div>
               </Button>
             </nav>
