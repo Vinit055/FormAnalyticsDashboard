@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import {
   BarChart,
   Clock,
@@ -58,15 +58,15 @@ export default function Dashboard() {
 
   // If loading, show loader
   if (isLoading) {
-    const HourglassElement = "l-hourglass" as any;
+    const HourglassElement = "l-hourglass" as keyof JSX.IntrinsicElements;
     return (
       <div className="flex flex-col min-h-screen items-center justify-center">
         <HourglassElement
-          size="60"
+          size={60}
           bg-opacity="0.1"
           speed="1.2"
           color="#74ec7c"
-        ></HourglassElement>
+        />
         <span className="mt-5 text-lg">
           Hold on while we get your dashboard ready!
         </span>
