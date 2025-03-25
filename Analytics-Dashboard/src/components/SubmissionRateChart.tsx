@@ -16,8 +16,8 @@ export function SubmissionRateChart({
   const abandonmentRate = calculateAbandonmentRate(data);
 
   const chartData = [
-    { name: "Completed", value: submissionRate, color: "hsl(0 0% 9%)" },
-    { name: "Abandoned", value: abandonmentRate, color: "hsl(0 0% 63.9%)" },
+    { name: "Completed", value: submissionRate, color: "var(--submission-success)" },
+    { name: "Abandoned", value: abandonmentRate, color: "var(--submission-failure)" },
   ];
 
   return (

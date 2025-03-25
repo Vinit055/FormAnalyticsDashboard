@@ -5,6 +5,10 @@
 
 
 :root {
+  --submission-success: #A5B68D;
+  --submission-failure: #7C444F;
+  --line-chart-stroke: #5C7285;
+  --error-chart-fill: #7C444F;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -40,6 +44,10 @@
 }
 
 .dark {
+  --submission-success: #98D17B;
+  --submission-failure: #D15668;
+  --line-chart-stroke: #789DBC;
+  --error-chart-fill: #9F5255;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

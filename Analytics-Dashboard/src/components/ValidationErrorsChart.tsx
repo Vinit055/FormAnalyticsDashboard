@@ -25,6 +25,7 @@ export function ValidationErrorsChart({
         <BarChart
           data={errorTypes}
           margin={{ top: 10, right: 10, left: 10, bottom: 24 }}
+          barSize={100}
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis
@@ -45,7 +46,7 @@ export function ValidationErrorsChart({
           <Tooltip formatter={(value) => [`${value}`, "Errors"]} />
           <Bar
             dataKey="count"
-            fill="hsl(var(--primary))"
+            fill="var(--error-chart-fill)"
             radius={[4, 4, 0, 0]}
             animationDuration={800}
           />

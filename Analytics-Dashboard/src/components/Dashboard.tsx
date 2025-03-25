@@ -31,6 +31,7 @@ import { ValidationErrorsChart } from "@/components/ValidationErrorsChart";
 import { ProblemFieldsTable } from "@/components/ProblemFieldsTable";
 import { TabAnalyticsTable } from "@/components/TabAnalyticsTable";
 import { SubmissionCompletionChart } from "./SubmissionCompletionChart";
+import { ThemeToggle } from "@/theme/ThemeButton";
 
 export default function Dashboard() {
   const [open, setOpen] = useState(false);
@@ -42,6 +43,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function loadData() {
       const data = await fetchAllAnalytics();
+      console.log("Vinit", data);
       setAnalyticsData(data);
     }
     loadData();
@@ -63,6 +65,9 @@ export default function Dashboard() {
         <div className="flex items-center gap-2 font-semibold">
           <FileBarChart className="h-5 w-5" />
           <span>Form Analytics</span>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle />
         </div>
       </div>
 
