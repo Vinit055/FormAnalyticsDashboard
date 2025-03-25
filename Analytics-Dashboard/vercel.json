@@ -1,0 +1,7 @@
+{
+  "routes": [
+    { "src": "/", "dest": "/" },
+    { "src": "/dashboard", "dest": "/" },
+    { "src": "/report", "dest": "/" }
+  ]
+}
