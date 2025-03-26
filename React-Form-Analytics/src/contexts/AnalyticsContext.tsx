@@ -103,10 +103,6 @@ export const AnalyticsProvider: React.FC<{
     dispatch({ type: "TAB_CHANGE", tab });
   };
 
-  const trackFormSubmit = () => {
-    exportAnalytics("submit");
-  };
-
   const trackFormAbandon = () => {
     dispatch({ type: "FORM_ABANDON" });
   };
@@ -186,6 +182,17 @@ export const AnalyticsProvider: React.FC<{
     },
     [analytics, dispatch]
   );
+
+  const trackFormSubmit = useCallback(async () => {
+    try {
+      await exportAnalytics("submit");
+      // After successful submission, redirect to a success page
+      window.location.href = "/form-success";
+    } catch (error) {
+      console.error("Error during form submission:", error);
+      return { success: false, error };
+    }
+  }, [exportAnalytics]);
 
   // Track when user leaves/closes the page
   useEffect(() => {

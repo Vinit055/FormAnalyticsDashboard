@@ -11,7 +11,7 @@ import {
 import { TrackedFormFieldProps } from "../types";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
-const ERROR_PERSISTENCE_THRESHOLD = 5000; // 1 minute
+const ERROR_PERSISTENCE_THRESHOLD = 60000; // 1 minute
 function TrackedFormField<TFormValues extends FieldValues>({
   name,
   label,
