@@ -38,6 +38,7 @@ export default function Dashboard() {
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [initialLoading, setInitialLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
   const { data, loading, refetch } = useAnalyticsPolling({
     pollingInterval: 60000, // Poll every minute
   });
@@ -224,7 +225,11 @@ export default function Dashboard() {
               </p>
             </div>
 
-            <Tabs defaultValue="overview" className="space-y-6">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="space-y-6"
+            >
               <TabsList className="grid w-full grid-cols-4 md:w-auto md:grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="submissions">Submissions</TabsTrigger>

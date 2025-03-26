@@ -9,7 +9,7 @@ createRoot(document.getElementById("root")!).render(
   <ThemeProvider defaultTheme="system" storageKey="form-analytics-theme">
     <BrowserRouter>
       <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Dashboard />} />
         {/* <Route path="/reports" element={<Reports />} /> */}
       </Routes>
     </BrowserRouter>
