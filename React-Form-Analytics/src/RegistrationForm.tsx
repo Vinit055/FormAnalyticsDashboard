@@ -93,7 +93,6 @@ const RegistrationFormInternal = () => {
     form.reset(form.formState.defaultValues);
     setActiveTab("personal");
 
-
     // Show success message
     toast.success("Form submitted successfully!");
   }
@@ -155,7 +154,10 @@ const RegistrationFormInternal = () => {
 // Wrapper component that provides analytics context
 const UserRegistrationForm = () => {
   return (
-    <AnalyticsProvider>
+    <AnalyticsProvider
+      formSchema={formSchema}
+      tabs={["personal", "professional", "payment", "experience"]}
+    >
       <RegistrationFormInternal />
     </AnalyticsProvider>
   );

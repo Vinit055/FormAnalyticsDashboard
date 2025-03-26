@@ -29,12 +29,20 @@ export const createInitialTabAnalytics = (): TabAnalytics => ({
 });
 
 export const createInitialAnalyticsState = (
-  formFields: Array<string>
+  formFields: Array<string>,
+  tabIds?: Array<string>
 ): FormAnalytics => {
   const fieldsAnalytics: Record<string, FieldAnalytics> = {};
+  const tabsAnalytics: Record<string, TabAnalytics> = {};
 
+  // Create field analytics for each form field
   formFields.forEach((field) => {
     fieldsAnalytics[field] = createInitialFieldAnalytics(field);
+  });
+
+  // Create tab analytics for each tab
+  tabIds?.forEach((tabId) => {
+    tabsAnalytics[tabId] = createInitialTabAnalytics();
   });
 
   return {
@@ -43,12 +51,7 @@ export const createInitialAnalyticsState = (
     formEndTime: null,
     formCompletionTime: null,
     fields: fieldsAnalytics,
-    tabs: {
-      personal: createInitialTabAnalytics(),
-      professional: createInitialTabAnalytics(),
-      payment: createInitialTabAnalytics(),
-      experience: createInitialTabAnalytics(),
-    },
+    tabs: tabsAnalytics,
     formSubmitted: false,
     formAbandoned: false,
     validationErrorCount: 0,
@@ -57,32 +60,24 @@ export const createInitialAnalyticsState = (
 };
 
 // The form fields array for analytics tracking
-export const analyticsFormFields = [
-  "firstName",
-  "lastName",
-  "email",
-  "dateOfBirth",
-  "gender",
-  "phone",
-  "address",
-  "city",
-  "country",
-  "zipCode",
-  "occupation",
-  "companyName",
-  "yearsOfExperience",
-  "skills",
-  "educationLevel",
-  "cardNumber",
-  "cardName",
-  "expiryDate",
-  "cvv",
-  "lifeGoals",
-  "problemSolvingApproach",
-  "ethicalDilemma",
-  "satisfactionLevel",
-  "receiveUpdates",
-] as const;
+export const getAnalyticsFormFields = (
+  formSchema: Record<string, any>
+): string[] => {
+  // If it's a Zod schema, get the shape from the internal structure
+  if (formSchema?.shape) {
+    return Object.keys(formSchema.shape);
+  } else if (formSchema?._def?.schema?._def?.shape) {
+    // Handle nested Zod schemas (like when using z.object(...).refine(...))
+    return Object.keys(formSchema._def.schema._def.shape);
+  } else if (typeof formSchema === "object" && formSchema !== null) {
+    // Fallback if it's just a regular object (not a Zod schema)
+    return Object.keys(formSchema);
+  }
+
+  // If all else fails, return empty array but log a warning
+  console.warn("Could not extract field names from form schema:", formSchema);
+  return [];
+};
 
 // Analytics reducer
 export const analyticsReducer = (
@@ -130,6 +125,11 @@ export const analyticsReducer = (
           };
         }
       });
+
+      // Create tab if it doesn't exist
+      if (!updatedTabs[action.tab]) {
+        updatedTabs[action.tab] = createInitialTabAnalytics();
+      }
 
       // Update current tab
       updatedTabs[action.tab] = {
@@ -226,7 +226,10 @@ export const analyticsReducer = (
       };
 
     case "RESET_ANALYTICS":
-      return createInitialAnalyticsState(Object.keys(state.fields));
+      return createInitialAnalyticsState(
+        Object.keys(state.fields),
+        Object.keys(state.tabs)
+      );
 
     default:
       return state;

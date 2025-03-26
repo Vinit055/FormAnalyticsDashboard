@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
-import { FormValues } from "@/schemas/FormSchema";
+import { FieldValues, useFormContext, useWatch } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -12,21 +11,21 @@ import {
 import { TrackedFormFieldProps } from "../types";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
-const ERROR_PERSISTENCE_THRESHOLD = 60000; // 1 minute
-const TrackedFormField: React.FC<TrackedFormFieldProps> = ({
+const ERROR_PERSISTENCE_THRESHOLD = 5000; // 1 minute
+function TrackedFormField<TFormValues extends FieldValues>({
   name,
   label,
   description,
   children,
-}) => {
+}: Readonly<TrackedFormFieldProps<TFormValues>>) {
   const { trackValidationError } = useAnalytics();
-  const form = useFormContext<FormValues>();
+  const form = useFormContext<TFormValues>();
   const errorTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Watch the field's value to detect changes
   useWatch({
     control: form.control,
-    name: name,
+    name,
   });
 
   // Track validation errors for this field with time persistence check
@@ -45,7 +44,7 @@ const TrackedFormField: React.FC<TrackedFormFieldProps> = ({
         // After threshold time, if the error still exists, track it
         if (form.formState.errors[name]) {
           trackValidationError(
-            name,
+            name as string,
             form.formState.errors[name]?.message as string
           );
         }
@@ -58,7 +57,7 @@ const TrackedFormField: React.FC<TrackedFormFieldProps> = ({
         clearTimeout(errorTimerRef.current);
       }
     };
-  }, [form.formState.errors[name], name, trackValidationError, form.formState]);
+  }, [form.formState.errors, name, trackValidationError, form.formState]);
 
   return (
     <FormField
@@ -78,6 +77,6 @@ const TrackedFormField: React.FC<TrackedFormFieldProps> = ({
       )}
     />
   );
-};
+}
 
 export default TrackedFormField;

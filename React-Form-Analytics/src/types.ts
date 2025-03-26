@@ -1,6 +1,5 @@
-import { Control } from "react-hook-form";
+import { Control, FieldValues, Path } from "react-hook-form";
 import { FormValues } from "./schemas/FormSchema";
-import { ReactElement } from "react";
 
 export interface InfoProps {
   control: Control<FormValues>;
@@ -21,11 +20,11 @@ export interface InputElementProps {
   onBlur?: (e: React.FocusEvent<any>) => void;
 }
 
-export interface TrackedFormFieldProps {
-  name: keyof FormValues;
+export interface TrackedFormFieldProps<TFormValues extends FieldValues> {
+  name: Path<TFormValues>;
   label: string;
   description?: string;
-  children: ReactElement<InputElementProps>;
+  children: React.ReactElement;
 }
 
 // Analytics data structure

@@ -11,7 +11,7 @@ import axios from "axios";
 import {
   analyticsReducer,
   createInitialAnalyticsState,
-  analyticsFormFields,
+  getAnalyticsFormFields,
 } from "@/utils/analyticsUtils";
 
 // Constants
@@ -23,12 +23,28 @@ const AnalyticsContext = createContext<AnalyticsContextType | undefined>(
 );
 
 // Provider component
-export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AnalyticsProvider: React.FC<{
+  children: React.ReactNode;
+  tabs?: string[];
+  formSchema: Record<string, any>;
+}> = ({ children, tabs, formSchema }) => {
+  // Use the form schema to get field names
+  const formFields = useMemo(
+    () => getAnalyticsFormFields(formSchema),
+    [formSchema]
+  );
+
+  // Create a default tab if none are provided
+  const normalizedTabs = useMemo(() => {
+    if (!tabs || tabs.length === 0) {
+      return ["default"];
+    }
+    return tabs;
+  }, [tabs]);
+
   const [analytics, dispatch] = useReducer(
     analyticsReducer,
-    createInitialAnalyticsState([...analyticsFormFields])
+    createInitialAnalyticsState(formFields, normalizedTabs)
   );
 
   const idleTimerRef = useRef<number | null>(null);
@@ -49,6 +65,11 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     // Start the timer
     resetIdleTimer();
+
+    // If using default tab, immediately track a visit to it
+    if (!tabs || tabs.length === 0) {
+      trackTabChange("default");
+    }
 
     // Reset timer on user activity
     const handleActivity = () => {
@@ -71,7 +92,7 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
       window.removeEventListener("scroll", handleActivity);
       window.removeEventListener("click", handleActivity);
     };
-  }, [resetIdleTimer]);
+  }, [resetIdleTimer, tabs]);
 
   // Analytics action functions
   const trackValidationError = (field: string, error: string) => {
@@ -113,7 +134,6 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({
           totalTime += now - currentTab.lastVisitTime;
         }
 
-        // Create clean tab object (without lastVisitTime)
         cleanTabs[tab] = {
           visits: currentTab.visits,
           totalTimeSpent: totalTime,
