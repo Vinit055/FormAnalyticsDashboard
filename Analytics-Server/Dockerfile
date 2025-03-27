@@ -8,14 +8,14 @@ RUN apt update && apt install -y curl && \
 ENV PATH="/root/.local/bin/:$PATH"
 
 # Copy project configuration files
-COPY Analytics-Server/pyproject.toml Analytics-Server/uv.lock Analytics-Server/.python-version ./
+COPY pyproject.toml uv.lock .python-version ./
 
 # Additional dependencies needed for clickhouse-driver
 # Install dependencies needed for clickhouse-driver and project dependencies
 RUN apt install -y gcc python3-dev && \
     uv sync
 # Copy application code
-COPY Analytics-Server/main.py ./
+COPY main.py ./
 
 # Set environment variables
 ENV ENVIRONMENT="production" \
