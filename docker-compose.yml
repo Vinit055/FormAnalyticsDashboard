@@ -18,6 +18,19 @@ services:
         soft: 262144
         hard: 262144
     restart: unless-stopped
+
+  analytics-dashboard:
+    image: analytics-dashboard
+    container_name: analytics-dashboard
+    network_mode: host
+    restart: unless-stopped
+
+  form-analytics:
+    image: form-analytics
+    container_name: form-analytics
+    network_mode: host
+    restart: unless-stopped
+
 # To run: docker-compose up -d
 # To connect to clickhouse: docker exec -it clickhouseDB clickhouse-client
 # To stop: docker-compose stop
