@@ -20,17 +20,16 @@ services:
     restart: unless-stopped
 
   analytics-dashboard:
-    image: analytics-dashboard
+    image: ghcr.io/vinit055/formanalyticsdashboard:latest
     container_name: analytics-dashboard
     network_mode: host
     restart: unless-stopped
 
   form-analytics:
-    image: form-analytics
+    image: ghcr.io/vinit055/formanalyticsserver:v1.0.0
     container_name: form-analytics
     network_mode: host
     restart: unless-stopped
-
 # To run: docker-compose up -d
 # To connect to clickhouse: docker exec -it clickhouseDB clickhouse-client
 # To stop: docker-compose stop
