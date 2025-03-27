@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { InfoProps } from "@/types";
-import TrackedFormField from "@/components/TrackedFormField";
+import { TrackedFormField } from "react-form-analytics";
 
 const ProfessionalInfo: React.FC<InfoProps> = ({ control }) => {
   return (

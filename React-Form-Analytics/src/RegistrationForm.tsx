@@ -18,8 +18,7 @@ import PersonalInfo from "./pages/PersonalInfo";
 import ProfessionalInfo from "./pages/ProfessionalInfo";
 import PaymentInfo from "./pages/PaymentInfo";
 import ExperienceInfo from "./pages/ExperienceInfo";
-import { useAnalytics } from "./hooks/useAnalytics";
-import { AnalyticsProvider } from "./contexts/AnalyticsContext";
+import { useAnalytics, AnalyticsProvider } from "react-form-analytics";
 
 const DRAFT_STORAGE_KEY = "registration_form_draft";
 

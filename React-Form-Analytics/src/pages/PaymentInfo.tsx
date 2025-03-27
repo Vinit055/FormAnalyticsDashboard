@@ -3,7 +3,7 @@ import { TabsContent } from "@/components/ui/tabs";
 import { CreditCard } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { InfoProps } from "@/types";
-import TrackedFormField from "@/components/TrackedFormField";
+import { TrackedFormField } from "react-form-analytics";
 
 const PaymentInfo: React.FC<InfoProps> = () => {
   return (

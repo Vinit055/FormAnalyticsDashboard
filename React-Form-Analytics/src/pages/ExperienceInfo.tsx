@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { InfoProps } from "@/types";
-import TrackedFormField from "@/components/TrackedFormField";
+import { TrackedFormField } from "react-form-analytics";
 
 const ExperienceInfo: React.FC<InfoProps> = ({ control }) => {
   return (

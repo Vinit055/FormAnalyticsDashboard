@@ -1,4 +1,4 @@
-import TrackedFormField from "@/components/TrackedFormField";
+import { TrackedFormField } from "react-form-analytics";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
