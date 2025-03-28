@@ -30,7 +30,7 @@ const FormSuccess: React.FC = () => {
 
         <p className="mb-6 text-center text-gray-600">
           Thank you for your submission. Your data has been received and
-          processed.
+          processed!
         </p>
 
         <div className="flex justify-center">
