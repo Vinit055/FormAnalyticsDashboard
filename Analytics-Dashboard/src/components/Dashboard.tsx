@@ -3,15 +3,12 @@ import {
   BarChart,
   Clock,
   FileBarChart,
-  Home,
   LayoutDashboard,
   Menu,
   RefreshCw,
-  Settings,
-  Users,
-  X,
 } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-mobile";
+import { Link } from "react-router-dom";
 import "ldrs/hourglass";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,18 +18,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { OverviewMetrics } from "@/components/OverviewMetrics";
-import { FormTimeChart } from "@/components/FormTimeChart";
-import { SubmissionRateChart } from "@/components/SubmissionRateChart";
-import { ValidationErrorsChart } from "@/components/ValidationErrorsChart";
-import { ProblemFieldsTable } from "@/components/ProblemFieldsTable";
-import { TabAnalyticsTable } from "@/components/TabAnalyticsTable";
-import { SubmissionCompletionChart } from "./SubmissionCompletionChart";
+import { OverviewMetrics } from "@/components/overview/OverviewMetrics";
+import { FormTimeChart } from "@/components/overview/FormTimeChart";
+import { SubmissionRateChart } from "@/components/overview/SubmissionRateChart";
+import { ValidationErrorsChart } from "@/components/errors/ValidationErrorsChart";
+import { ProblemFieldsTable } from "@/components/errors/ProblemFieldsTable";
+import { TabAnalyticsTable } from "@/components/form-tabs/TabAnalyticsTable";
+import { SubmissionCompletionChart } from "./submissions/SubmissionCompletionChart";
 import { ThemeToggle } from "@/theme/ThemeButton";
 import { useAnalyticsPolling } from "@/data/useAnalyticsPolling";
-import "./loader.css";
+import "../styles/loader.css";
 
 export default function Dashboard() {
   const [open, setOpen] = useState(false);
@@ -43,7 +40,7 @@ export default function Dashboard() {
     pollingInterval: 60000, // Poll every minute
   });
 
-  // Add a 5-second initial loading state
+  // Add a 3-second initial loading state
   useEffect(() => {
     const timer = setTimeout(() => {
       setInitialLoading(false);
@@ -110,70 +107,50 @@ export default function Dashboard() {
         {/* Sidebar for desktop */}
         {isDesktop ? (
           <div className="hidden w-[240px] flex-col border-r bg-background lg:flex">
-            <div className="flex h-14 items-center border-b px-6 lg:h-[60px]">
-              <div className="flex items-center gap-2 font-semibold">
-                <FileBarChart className="h-5 w-5" />
-                <span>Form Analytics</span>
-              </div>
-            </div>
             <nav className="grid gap-1 p-4">
               <Button
                 variant="secondary"
                 className="justify-start gap-2"
                 asChild
               >
-                <div>
+                <Link to="/">
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
-                </div>
+                </Link>
               </Button>
               <Button variant="ghost" className="justify-start gap-2" asChild>
-                <div>
+                <Link to="/reports">
                   <BarChart className="h-4 w-4" />
                   Reports
-                </div>
+                </Link>
               </Button>
             </nav>
           </div>
         ) : (
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetContent side="left" className="w-[240px] p-0">
+            <SheetContent
+              side="left"
+              className="w-[240px] p-0"
+              aria-labelledby="sheet-title"
+            >
               <div className="flex h-14 items-center border-b px-6">
                 <div className="flex items-center gap-2 font-semibold">
                   <FileBarChart className="h-5 w-5" />
                   <span>Form Analytics</span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="ml-auto"
-                  onClick={() => setOpen(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
               </div>
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <nav className="grid gap-1 p-4">
-                <Button
-                  variant="ghost"
-                  className="justify-start gap-2"
-                  asChild
-                  onClick={() => setOpen(false)}
-                >
-                  <div>
-                    <Home className="h-4 w-4" />
-                    Home
-                  </div>
-                </Button>
                 <Button
                   variant="secondary"
                   className="justify-start gap-2"
                   asChild
                   onClick={() => setOpen(false)}
                 >
-                  <div>
+                  <Link to="/">
                     <LayoutDashboard className="h-4 w-4" />
                     Dashboard
-                  </div>
+                  </Link>
                 </Button>
                 <Button
                   variant="ghost"
@@ -181,32 +158,10 @@ export default function Dashboard() {
                   asChild
                   onClick={() => setOpen(false)}
                 >
-                  <div>
+                  <Link to="/reports">
                     <BarChart className="h-4 w-4" />
                     Reports
-                  </div>
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="justify-start gap-2"
-                  asChild
-                  onClick={() => setOpen(false)}
-                >
-                  <div>
-                    <Users className="h-4 w-4" />
-                    Users
-                  </div>
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="justify-start gap-2"
-                  asChild
-                  onClick={() => setOpen(false)}
-                >
-                  <div>
-                    <Settings className="h-4 w-4" />
-                    Settings
-                  </div>
+                  </Link>
                 </Button>
               </nav>
             </SheetContent>

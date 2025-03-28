@@ -2,7 +2,7 @@
   --uib-size: 65px;
   --uib-color: #74ec7c;
   --uib-speed: 1.15s;
-  --uib-bg-opacity: 0.1;
+  --uib-bg-opacity: 0.4;
   position: relative;
   display: flex;
   flex-direction: column;

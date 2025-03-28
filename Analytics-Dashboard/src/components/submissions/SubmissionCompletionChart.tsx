@@ -6,15 +6,10 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-import type { FormAnalyticsCollection } from "@/types/types";
+import type { DataProps } from "@/types/types";
+import { AlertTriangle } from "lucide-react";
 
-interface SubmissionCompletionChartProps {
-  data: FormAnalyticsCollection;
-}
-
-export function SubmissionCompletionChart({
-  data,
-}: Readonly<SubmissionCompletionChartProps>) {
+export function SubmissionCompletionChart({ data }: Readonly<DataProps>) {
   // Analyze the sessions to group by completion time ranges
   const completedSessions = data.sessions.filter(
     (session) => session.formSubmitted
@@ -44,6 +39,18 @@ export function SubmissionCompletionChart({
       timeRanges[4].count++;
     }
   });
+
+  if (
+    data.sessions.length === 0 ||
+    data.sessions.every((item) => item.formSubmitted === false)
+  ) {
+    return (
+      <div className="h-[240px] w-full flex items-center justify-center text-gray-500 gap-2">
+        <AlertTriangle className="h-4 w-4 text-amber-500" />
+        No data available
+      </div>
+    );
+  }
 
   return (
     <div className="h-[300px]">

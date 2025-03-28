@@ -7,15 +7,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { FormAnalyticsCollection } from "@/types/types";
+import type { DataProps } from "@/types/types";
 import { formatTime } from "@/lib/analytics-utils";
 import { useMemo } from "react";
+import { AlertTriangle } from "lucide-react";
 
-interface FormTimeChartProps {
-  readonly data: FormAnalyticsCollection;
-}
-
-export function FormTimeChart({ data }: FormTimeChartProps) {
+export function FormTimeChart({ data }: Readonly<DataProps>) {
   const chartData = useMemo(() => {
     if (!data.sessions || data.sessions.length === 0) {
       return [];
@@ -64,8 +61,9 @@ export function FormTimeChart({ data }: FormTimeChartProps) {
   // If no data, display a message
   if (chartData.length === 0 || chartData.every((item) => item.time === 0)) {
     return (
-      <div className="h-[240px] w-full flex items-center justify-center text-gray-500">
-        No completion time data available
+      <div className="h-[240px] w-full flex items-center justify-center text-gray-500 gap-2">
+        <AlertTriangle className="h-4 w-4 text-amber-500" />
+        No data available
       </div>
     );
   }

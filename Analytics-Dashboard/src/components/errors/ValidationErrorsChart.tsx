@@ -7,17 +7,24 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { FormAnalyticsCollection } from "@/types/types";
+import type { DataProps } from "@/types/types";
 import { getValidationErrorTypes } from "@/lib/analytics-utils";
+import { AlertTriangle } from "lucide-react";
 
-interface ValidationErrorsChartProps {
-  readonly data: FormAnalyticsCollection;
-}
-
-export function ValidationErrorsChart({
-  data,
-}: Readonly<ValidationErrorsChartProps>) {
+export function ValidationErrorsChart({ data }: Readonly<DataProps>) {
   const errorTypes = getValidationErrorTypes(data);
+
+  if (
+    data.sessions.length === 0 ||
+    data.sessions.every((item) => item.validationErrorCount === 0)
+  ) {
+    return (
+      <div className="h-[240px] w-full flex items-center justify-center text-gray-500 gap-2">
+        <AlertTriangle className="h-4 w-4 text-amber-500" />
+        No data available
+      </div>
+    );
+  }
 
   return (
     <div className="h-[300px] w-full">

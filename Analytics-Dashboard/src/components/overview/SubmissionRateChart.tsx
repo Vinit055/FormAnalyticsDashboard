@@ -1,24 +1,36 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import type { FormAnalyticsCollection } from "@/types/types";
+import type { DataProps } from "@/types/types";
 import {
   calculateAbandonmentRate,
   calculateSubmissionRate,
 } from "@/lib/analytics-utils";
+import { AlertTriangle } from "lucide-react";
 
-interface SubmissionRateChartProps {
-  data: FormAnalyticsCollection;
-}
-
-export function SubmissionRateChart({
-  data,
-}: Readonly<SubmissionRateChartProps>) {
+export function SubmissionRateChart({ data }: Readonly<DataProps>) {
   const submissionRate = calculateSubmissionRate(data);
   const abandonmentRate = calculateAbandonmentRate(data);
 
   const chartData = [
-    { name: "Completed", value: submissionRate, color: "var(--submission-success)" },
-    { name: "Abandoned", value: abandonmentRate, color: "var(--submission-failure)" },
+    {
+      name: "Completed",
+      value: submissionRate,
+      color: "var(--submission-success)",
+    },
+    {
+      name: "Abandoned",
+      value: abandonmentRate,
+      color: "var(--submission-failure)",
+    },
   ];
+
+  if (data.sessions.length === 0) {
+    return (
+      <div className="h-[240px] w-full flex items-center justify-center text-gray-500 gap-2">
+        <AlertTriangle className="h-4 w-4 text-amber-500" />
+        No data available
+      </div>
+    );
+  }
 
   return (
     <div className="h-[240px] w-full">

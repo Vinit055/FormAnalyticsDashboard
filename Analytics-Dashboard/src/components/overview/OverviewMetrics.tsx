@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { FormAnalyticsCollection } from "@/types/types";
+import type { FormAnalyticsCollection, DataProps } from "@/types/types";
 import {
   calculateAbandonmentRate,
   calculateAverageCompletionTime,
@@ -14,54 +14,65 @@ import {
   formatTime,
 } from "@/lib/analytics-utils";
 
-interface OverviewMetricsProps {
-  data: FormAnalyticsCollection;
-}
-
-export function OverviewMetrics({ data }: Readonly<OverviewMetricsProps>) {
-  // Define current and previous month timeframes
+export function OverviewMetrics({ data }: Readonly<DataProps>) {
+  // Define current and previous week timeframes
   const now = new Date();
-  const currentMonthStart = new Date(
+  const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  const daysFromStartOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Adjust to make Monday the start of the week
+
+  // Current week (starting Monday)
+  const currentWeekStart = new Date(
     now.getFullYear(),
     now.getMonth(),
-    1
+    now.getDate() - daysFromStartOfWeek,
+    0,
+    0,
+    0,
+    0
   ).getTime();
-  const previousMonthStart = new Date(
+
+  // Previous week
+  const previousWeekStart = new Date(
     now.getFullYear(),
-    now.getMonth() - 1,
-    1
+    now.getMonth(),
+    now.getDate() - daysFromStartOfWeek - 7,
+    0,
+    0,
+    0,
+    0
   ).getTime();
-  const previousMonthEnd = currentMonthStart - 1;
 
-  // Filter sessions by month
-  const currentMonthSessions = data.sessions.filter(
-    (session) => session.formStartTime >= currentMonthStart
+  const previousWeekEnd = currentWeekStart - 1;
+
+  // Filter sessions by week
+  const currentWeekSessions = data.sessions.filter(
+    (session) => session.formStartTime >= currentWeekStart
   );
-  const previousMonthSessions = data.sessions.filter(
+  const previousWeekSessions = data.sessions.filter(
     (session) =>
-      session.formStartTime >= previousMonthStart &&
-      session.formStartTime <= previousMonthEnd
+      session.formStartTime >= previousWeekStart &&
+      session.formStartTime <= previousWeekEnd
   );
 
-  // Create current and previous month data collections
-  const currentMonthData: FormAnalyticsCollection = {
-    sessions: currentMonthSessions,
+  // Create current and previous week data collections
+  const currentWeekData: FormAnalyticsCollection = {
+    sessions: currentWeekSessions,
   };
-  const previousMonthData: FormAnalyticsCollection = {
-    sessions: previousMonthSessions,
+  const previousWeekData: FormAnalyticsCollection = {
+    sessions: previousWeekSessions,
   };
 
-  // Calculate current month metrics
-  const totalUsers = currentMonthData.sessions.length;
-  const avgTimeSpent = calculateAverageCompletionTime(currentMonthData);
-  const submissionRate = calculateSubmissionRate(currentMonthData);
-  const abandonmentRate = calculateAbandonmentRate(currentMonthData);
+  // Calculate current week metrics
+  const totalUsers = currentWeekData.sessions.length;
+  const avgTimeSpent = calculateAverageCompletionTime(currentWeekData);
+  const submissionRate = calculateSubmissionRate(currentWeekData);
+  const abandonmentRate = calculateAbandonmentRate(currentWeekData);
 
-  // Calculate previous month metrics
-  const prevTotalUsers = previousMonthData.sessions.length;
-  const prevAvgTimeSpent = calculateAverageCompletionTime(previousMonthData);
-  const prevSubmissionRate = calculateSubmissionRate(previousMonthData);
-  const prevAbandonmentRate = calculateAbandonmentRate(previousMonthData);
+  // Calculate previous week metrics
+  const prevTotalUsers = previousWeekData.sessions.length;
+  const prevAvgTimeSpent = calculateAverageCompletionTime(previousWeekData);
+  const prevSubmissionRate = calculateSubmissionRate(previousWeekData);
+  const prevAbandonmentRate = calculateAbandonmentRate(previousWeekData);
 
   // Calculate differences
   const usersDiff =
@@ -98,7 +109,7 @@ export function OverviewMetrics({ data }: Readonly<OverviewMetricsProps>) {
               {usersDiff >= 0 ? "+" : ""}
               {usersDiff.toFixed(1)}%
             </span>{" "}
-            from last month
+            from last week
           </p>
         </CardContent>
       </Card>
@@ -122,7 +133,7 @@ export function OverviewMetrics({ data }: Readonly<OverviewMetricsProps>) {
               {timeDiff <= 0 ? "-" : "+"}
               {formattedTimeDiff}
             </span>{" "}
-            from last month
+            from last week
           </p>
         </CardContent>
       </Card>
@@ -148,7 +159,7 @@ export function OverviewMetrics({ data }: Readonly<OverviewMetricsProps>) {
               {submissionDiff >= 0 ? "+" : ""}
               {submissionDiff.toFixed(1)}%
             </span>{" "}
-            from last month
+            from last week
           </p>
         </CardContent>
       </Card>
@@ -176,7 +187,7 @@ export function OverviewMetrics({ data }: Readonly<OverviewMetricsProps>) {
               {abandonmentDiff <= 0 ? "-" : "+"}
               {Math.abs(abandonmentDiff).toFixed(1)}%
             </span>{" "}
-            from last month
+            from last week
           </p>
         </CardContent>
       </Card>

@@ -8,16 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { FormAnalyticsCollection } from "@/types/types";
+import type { DataProps } from "@/types/types";
 import { getTopProblemFields } from "@/lib/analytics-utils";
 
-interface ProblemFieldsTableProps {
-  data: FormAnalyticsCollection;
-}
-
-export function ProblemFieldsTable({
-  data,
-}: Readonly<ProblemFieldsTableProps>) {
+export function ProblemFieldsTable({ data }: Readonly<DataProps>) {
   const problemFields = getTopProblemFields(data);
 
   // Format field names for display (convert camelCase to Title Case)
@@ -26,6 +20,18 @@ export function ProblemFieldsTable({
       .replace(/([A-Z])/g, " $1") // Insert a space before all capital letters
       .replace(/^./, (str) => str.toUpperCase()); // Capitalize the first letter
   };
+
+  if (
+    data.sessions.length === 0 ||
+    data.sessions.every((item) => item.validationErrorCount === 0)
+  ) {
+    return (
+      <div className="h-[240px] w-full flex items-center justify-center text-gray-500 gap-2">
+        <AlertTriangle className="h-4 w-4 text-amber-500" />
+        No data available
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
