@@ -10,6 +10,8 @@ export interface FormField {
 export interface TabAnalytics {
   visits: number;
   totalTimeSpent: number;
+  lastVisitedAt: number;
+  lastVisitTimee: number | null;
 }
 
 export interface FormAnalytics {

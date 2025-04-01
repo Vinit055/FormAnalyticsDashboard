@@ -135,21 +135,33 @@ export function getTabAnalytics(data: FormAnalyticsCollection): TabSummary[] {
 
   // Process each session
   data.sessions.forEach((session) => {
+    // Find the last tab visited in this session based on lastVisitedAt timestamp
+    let lastVisitedTabId: string | null = null;
+    let lastVisitTime = 0;
+
+    // First pass: initialize tab data and find the last visited tab
     Object.entries(session.tabs).forEach(([tabId, tabData]) => {
+      // Initialize tab data if not exists
       if (!tabMap[tabId]) {
         tabMap[tabId] = { visits: 0, timeSpent: 0, abandonments: 0 };
       }
 
+      // Track basic metrics
       tabMap[tabId].visits += tabData.visits;
       tabMap[tabId].timeSpent += tabData.totalTimeSpent;
 
-      // Check if this was the last tab visited before abandonment
-      if (session.formAbandoned) {
-        // This is a simplification - in reality you'd need to determine the last tab
-        // For now, we'll count all tabs in abandoned sessions
-        tabMap[tabId].abandonments++;
+      // Determine if this tab was the last visited based on lastVisitedAt
+      const visitedAt = tabData.lastVisitedAt || 0;
+      if (visitedAt > lastVisitTime) {
+        lastVisitTime = visitedAt;
+        lastVisitedTabId = tabId;
       }
     });
+
+    // Only increment abandonment for the last tab if the form was abandoned
+    if (session.formAbandoned && lastVisitedTabId) {
+      tabMap[lastVisitedTabId].abandonments++;
+    }
   });
 
   // Format display names (capitalize first letter)
