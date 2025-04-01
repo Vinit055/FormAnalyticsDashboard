@@ -167,7 +167,9 @@ async def get_form_analytics():
                 tab_data = json.loads(field_value)
                 sessions_data[session_id]["tabs"][field_name] = {
                     "visits": tab_data.get("visits", 0),
-                    "totalTimeSpent": tab_data.get("totalTimeSpent", 0) * 1000  # Convert back to milliseconds
+                    "totalTimeSpent": tab_data.get("totalTimeSpent", 0) * 1000,  # Convert back to milliseconds
+                    'lastVisitTime': tab_data.get('lastVisitTime'),
+                    'lastVisitedAt': tab_data.get('lastVisitedAt')
                 }
             else:
                 # Parse field data
@@ -190,86 +192,6 @@ async def get_form_analytics():
     except Exception as e:
         logger.error(f"Error fetching analytics data: {str(e)}")
         return {"message": f"Error fetching data: {str(e)}", "status": "error"}
-
-# Also add a method to get analytics for a specific session
-@app.get("/formAnalytics/{session_id}")
-async def get_session_analytics(session_id: str):
-    """
-    Fetch analytics data for a specific session
-    """
-    try:
-        # Get session data
-        session_result = clickhouse_client.execute("""
-            SELECT 
-                toString(session_id) as session_id,
-                toUnixTimestamp(form_start_time) * 1000 as form_start_time,
-                toUnixTimestamp(form_end_time) * 1000 as form_end_time,
-                form_completion_time * 1000 as form_completion_time, 
-                form_submitted,
-                form_abandoned,
-                validation_error_count,
-                export_reason
-            FROM form_sessions
-            WHERE session_id = %(session_id)s
-        """, {"session_id": UUID(session_id)})
-        
-        if not session_result:
-            return {"message": "Session not found", "status": "error"}
-        
-        # Get fields data for this session
-        fields_result = clickhouse_client.execute("""
-            SELECT 
-                field_category,
-                field_name,
-                field_value,
-                has_validation_errors
-            FROM form_fields
-            WHERE session_id = %(session_id)s
-        """, {"session_id": UUID(session_id)})
-        
-        # Process and structure the data
-        session_data = {
-            "sessionId": session_id,
-            "formStartTime": session_result[0][1],
-            "formEndTime": session_result[0][2],
-            "formCompletionTime": session_result[0][3],
-            "formSubmitted": session_result[0][4],
-            "formAbandoned": session_result[0][5],
-            "validationErrorCount": session_result[0][6],
-            "exportReason": session_result[0][7],
-            "fields": {},
-            "tabs": {}
-        }
-        
-        # Process fields and tabs data
-        for row in fields_result:
-            field_category, field_name, field_value, _ = row
-            
-            if field_category == 'tabs':
-                # Parse tab data
-                tab_data = json.loads(field_value)
-                session_data["tabs"][field_name] = {
-                    "visits": tab_data.get("visits", 0),
-                    "totalTimeSpent": tab_data.get("totalTimeSpent", 0) * 1000  # Convert back to milliseconds
-                }
-            else:
-                # Parse field data
-                field_data = json.loads(field_value)
-                field_id = field_data.get("id", field_name)
-                
-                # Recreate the field structure based on the stored JSON
-                session_data["fields"][field_name] = {
-                    "id": field_id,
-                    "validationErrors": field_data.get("validationErrors", [])
-                }
-        
-        return session_data
-    
-    except Exception as e:
-        logger.error(f"Error fetching session data: {str(e)}")
-        return {"message": f"Error fetching session data: {str(e)}", "status": "error"}
-
-
 
 
 def store_session_data(data):
@@ -336,6 +258,8 @@ def store_field_data(data):
             tab_value = {
                 'visits': tab_data.get('visits', 0),
                 'totalTimeSpent': tab_data.get('totalTimeSpent', 0) / 1000,  # Convert to seconds
+                "lastVisitTime": tab_data.get("lastVisitTime"),
+                "lastVisitedAt": tab_data.get("lastVisitedAt")
             }
             
             rows.append((
