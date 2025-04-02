@@ -20,13 +20,13 @@ services:
     restart: unless-stopped
 
   analytics-dashboard:
-    image: ghcr.io/vinit055/formanalyticsdashboard:latest
+    image: ghcr.io/vinitdamania/formanalyticsdashboard:latest
     container_name: analytics-dashboard
     network_mode: host
     restart: unless-stopped
 
   form-analytics:
-    image: ghcr.io/vinit055/formanalyticsserver:latest
+    image: ghcr.io/vinitdamania/formanalyticsserver:latest
     container_name: analytics-server
     network_mode: host
     restart: unless-stopped
